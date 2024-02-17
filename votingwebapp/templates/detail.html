@@ -1,0 +1,67 @@
+{% extends 'base.html' %}
+
+
+{% block content %}
+
+<div class="container voteContainer">
+    <h2>Vote Your Choice</h2>
+    <h4>Pick your {{category.title}}</h4> <!-- This calls the category tasks and links to the title variable made in /admin-->
+
+    {% if msg  %} <!-- if msg has a value then the following will display telling the user they have already voted  -->
+
+    
+    <div class="alert alert-primary" role="alert">
+      You have already voted in this category
+    </div>
+
+
+
+    {% else %}
+
+
+
+    <form action="" method='POST'>
+
+      {% csrf_token %}
+      
+      {% for category in categories  %} 
+
+      <div class="form-check">
+        <input class="form-check-input" type="radio" value="{{category.id}}" name="category_item" id="flexRadioDefault{{category.id}}" required>
+        <label class="form-check-label" for="flexRadioDefault{{category.id}}">
+          {{category.title}}
+        </label>
+      </div>
+        
+      {% endfor %}
+        
+    
+     
+
+          
+          
+   
+
+    <button type="submit" class='btn btn-primary'>Submit</button>
+  </form>
+
+
+    
+    
+    {% endif %}
+
+    
+
+
+    
+    
+    
+   
+
+   
+</div>
+
+
+    
+{% endblock content %}
+    
