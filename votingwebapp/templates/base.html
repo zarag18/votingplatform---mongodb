@@ -5,6 +5,8 @@
 
 <html lang="en">
 <head>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     {% comment %} <link rel="icon" type="image/x-icon" href="{% static 'assets/favicon.ico' %}" /> {% endcomment %}
@@ -12,22 +14,25 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.4.1/font/bootstrap-icons.css" rel="stylesheet" />
     <link rel="stylesheet" href="{% static 'css/bootstrap.css' %}">
     <link rel="stylesheet" href="{% static 'css/style.css' %}">
-    <title>Evoting - Vote Well</title>
+    <title>Oscars Voting System</title>
 </head>
 <body>
 
      <!-- Responsive navbar-->
      <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
         <div class="container px-lg-5">
-            <a class="navbar-brand" href="{% url 'index'  %}">WeVote</a>
+            <a class="navbar-brand" href="{% url 'index'  %}">
+            <i class="fa fa-film" style="font-size:24px"></i> StarVote
+            </a>
+            
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation"><span class="navbar-toggler-icon"></span></button>
             <div class="collapse navbar-collapse" id="navbarSupportedContent">
                 <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
                   
-                 
+                    <li class="nav-item"><a class="nav-link" href="{% url 'poll_results' %}"><button class="btn btn-secondary">View Results</button></a></li>
                     {% if request.user.is_authenticated %}
 
-                    <li class="nav-item"><a class="nav-link" href="#"><button class="btn btn-primary">Hi, {{request.user.username}}</button></a></li>
+                    <li class="nav-item"><a class="nav-link" href="#"><button class="btn btn-primary">Welcome {{request.user.username}} !</button></a></li>
 
                     <li class="nav-item"><a class="nav-link" href="{% url 'logout' %}"><button class="btn btn-secondary">Logout</button></a></li>
                     

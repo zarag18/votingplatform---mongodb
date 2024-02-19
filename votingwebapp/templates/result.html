@@ -14,7 +14,7 @@
       <h4>{{category.title}}</h4>
       <br>
   
-      <h5>Total Votes = {{category.total_vote}}</h5>
+      <!--<h5>Total Votes = {{category.total_vote}}</h5>-->
       <br />
   
       
@@ -33,7 +33,7 @@
             aria-valuemin="0"
             aria-valuemax="100"
           >
-          {{ item.percentage_vote | floatformat:2 }}
+          {{ item.percentage_vote | floatformat:2 }}% <!--shows the percentage of votes for that category-->
           </div>
         </div>
       </div>

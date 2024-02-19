@@ -15,47 +15,41 @@ def index (request):
     return render(request, "index.html", context)
 
 @login_required(login_url="signin") #to make sure user is logged in before they can vote 
-def detail (request, slug):
+def detail(request, slug):
     category = Category.objects.get(slug=slug)
-    categories = CategoryItem.objects.filter(category =category)
-
-    msg = None 
-
+    categories = CategoryItem.objects.filter(category=category)
+    
+    msg = None
+    
     if request.user.is_authenticated:
-        if category.voters.filter(id =request.user.id).exists():
-            msg = "voted" #once the user is authenicated and has casted and vote, a msg will display saying voted 
-
+        if category.voters.filter(id=request.user.id).exists():
+            msg = "voted"
+            
     if request.method == 'POST':
-        selected_id  = request.POST.get("category_item")
-        print(selected_id)
-        item = CategoryItem.objects.get(id = selected_id)
+        selected_id = request.POST.get("category_item")
+        item = CategoryItem.objects.get(id=selected_id)
+        item.total_vote += 1
         
         item_category = item.category 
         item_category.total_vote += 1
-
-        #Insert into MongoDB with the total vote for the category item
-        votes_collection.insert_one(
-            {'category_item': selected_id},
-            {'$inc': {'total_vote': 1}}
-        )
-        print("added to database")
-
-        # Update MongoDB with the total vote for the category
-        votes_collection.insert_one(
-            {'category_item': item.category.id},
-            {'$inc': {'total_vote': 1}}
-        )
-
+        
         item.voters.add(request.user)
-        item.category.voters.add(request.user)
-
+        item_category.voters.add(request.user)
+        
         item.save()
         item_category.save()
-
-        return redirect("result", slug = category.slug)
+        # Insert vote information into MongoDB collection
+        vote_info = {
+            'ID of Category Item': str(item.id),
+            'Total Votes of Item': item.total_vote,
+            'Item Name': item.title,
+            'Voter Username': request.user.username,
+        }
+        votes_collection.insert_one(vote_info)
+        
+        return redirect("result", slug=category.slug)
     
-
-    context = {"category":category, "categories":categories, "msg" : msg}
+    context = {"category": category, "categories": categories, "msg": msg}
     return render(request, "detail.html", context)
 
          
@@ -65,6 +59,8 @@ def result (request, slug):
     items = CategoryItem.objects.filter(category=category)
     context = {"category":category, "items":items}
     return render(request, "result.html", context)
+
+
 
 def signin(request):
     msg = ""
@@ -109,4 +105,12 @@ def signup(request):
 def signout(request):
     logout(request)
     return redirect("index")
+
+def poll_results(request):
+    # Fetch all category items with their associated votes
+    category_items = CategoryItem.objects.all()
+    category = Category.objects.all()
+   
+    context = { 'category':category, 'category_items': category_items}
+    return render(request, 'pollresults.html', context)
 

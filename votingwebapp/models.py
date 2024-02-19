@@ -4,7 +4,7 @@ from .mongoDB import database
 
 # Create your models here.
 
-votes_collection = database['CategoryItem']
+votes_collection = database['votes'] #name of collection 
 
 class Category(models.Model):
     title = models.CharField(max_length=200)
