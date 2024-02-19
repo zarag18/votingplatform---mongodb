@@ -4,8 +4,8 @@ from .mongoDB import database
 
 # Create your models here.
 
-votes_collection = database['votes'] #name of collection 
-users_collection = database['users']
+votes_collection = database['votes'] #name of votes collection in db
+users_collection = database['users'] #name of users collection in db
 
 class Category(models.Model):
     title = models.CharField(max_length=200)

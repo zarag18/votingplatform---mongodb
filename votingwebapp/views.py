@@ -1,8 +1,13 @@
 from django.shortcuts import render, redirect
+from django.contrib.auth.models import User 
+from django.contrib.auth.forms import AuthenticationForm 
+from django import forms 
 from .models import Category, CategoryItem, votes_collection, users_collection
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required 
+from email_validator import validate_email 
+from django.core.exceptions import ValidationError 
 import requests
 
 
@@ -65,47 +70,63 @@ def result (request, slug):
 def signin(request):
     msg = ""
     if request.method == 'POST':
-        username = request.POST['username']
-        password = request.POST['password']
-        user = authenticate(request, username=username, password=password)
-        if user is not None:
-            login(request, user)
-            
-            if "next" in request.POST:
-                return redirect(request.POST.get("next"))
-            
-            else:
-            
-                return redirect("index")
-        else:
-            msg = "Invalid Credentials"
-            
-    context = {"msg":msg}
-    return render(request, "signin.html", context)
-
-def signup(request):
-
-    form = UserCreationForm()
-    if request.method == 'POST':
-        form = UserCreationForm(request.POST)
+        form = AuthenticationForm(request, request.POST)
         if form.is_valid():
-            form.save()
-            
-            # login starts here
-            username = request.POST['username']
-            password = request.POST['password1']
-            users = {
-                "Username":username
-            }
-            users_collection.insert_one(users)
-            user = authenticate(request, username=username, password=password)
+            username = form.cleaned_data['username']
+            password = form.cleaned_data['password']
+            user = authenticate(username=username, password=password)
             if user is not None:
                 login(request, user)
-                return redirect("index")
-            
-            
-    context = {"form":form}
+                if "next" in request.POST:
+                    return redirect(request.POST.get("next"))
+                else:
+                    return redirect("index")
+            else:
+                msg = "Invalid Credentials"
+        else:
+            msg = "Invalid Credentials"
+
+    form = AuthenticationForm()
+    context = {"form": form, "msg": msg}
+    return render(request, "signin.html", context)
+
+
+def signup(request):
+    class SignUpForm(UserCreationForm):
+        email = forms.EmailField()
+
+        class Meta:
+            model = User #by importing user 
+            fields = ['username', 'email', 'password1', 'password2']
+
+    form = SignUpForm()
+    if request.method == 'POST':
+        form = SignUpForm(request.POST)
+        if form.is_valid():
+            # Perform additional email validation
+            email = form.cleaned_data['email']
+            try:
+                validate_email(email) #uses the validation library from django to verify email
+            except ValidationError:
+                form.add_error('email', 'Invalid email address')
+            else:
+                form.save()
+                # Additional processing
+                username = form.cleaned_data['username']
+                password = form.cleaned_data['password1']
+                users = {
+                    "Username": username,
+                    "Email Address": email
+                }
+                users_collection.insert_one(users)  # users are inserted into the database
+                user = authenticate(request, username=username, password=password)
+                if user is not None:
+                    login(request, user)
+                    return redirect("index")
+
+    context = {"form": form}
     return render(request, "signup.html", context)
+
 def signout(request):
     logout(request)
     return redirect("index")
