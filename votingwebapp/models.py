@@ -33,7 +33,7 @@ class CategoryItem(models.Model):
 
         else: 
             vote_in_percentage = (items_votes/category_votes) * 100 #operation to get the percentage votes 
-        return vote_in_percentage
+        return vote_in_percentage #hello
 
     def __str__(self):
         return self.title
