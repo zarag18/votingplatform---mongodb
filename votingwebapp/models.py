@@ -5,6 +5,7 @@ from .mongoDB import database
 # Create your models here.
 
 votes_collection = database['votes'] #name of collection 
+users_collection = database['users']
 
 class Category(models.Model):
     title = models.CharField(max_length=200)
@@ -33,7 +34,7 @@ class CategoryItem(models.Model):
 
         else: 
             vote_in_percentage = (items_votes/category_votes) * 100 #operation to get the percentage votes 
-        return vote_in_percentage #hello
+        return vote_in_percentage 
 
     def __str__(self):
         return self.title

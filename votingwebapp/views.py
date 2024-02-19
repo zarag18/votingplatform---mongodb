@@ -1,5 +1,5 @@
 from django.shortcuts import render, redirect
-from .models import Category, CategoryItem, votes_collection
+from .models import Category, CategoryItem, votes_collection, users_collection
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required 
@@ -94,6 +94,10 @@ def signup(request):
             # login starts here
             username = request.POST['username']
             password = request.POST['password1']
+            users = {
+                "Username":username
+            }
+            users_collection.insert_one(users)
             user = authenticate(request, username=username, password=password)
             if user is not None:
                 login(request, user)
@@ -110,7 +114,6 @@ def poll_results(request):
     # Fetch all category items with their associated votes
     category_items = CategoryItem.objects.all()
     category = Category.objects.all()
-   
     context = { 'category':category, 'category_items': category_items}
     return render(request, 'pollresults.html', context)
 
